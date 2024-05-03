@@ -16,7 +16,7 @@ AAABAAYAAAAAAAEAIAD5FgAAZgAAAICAAAABACAAKAgBAF8XAABAQAAAAQAgAChCAACHHwEAMDAAAAEA
 
 def añadir():
     def guardar():
-    # Obtener el correo y el nombre ingresados
+        # Obtener el correo y el nombre ingresados
         correo = entry_correo.get()
         nombre = entry_nombre.get()
 
@@ -25,7 +25,7 @@ def añadir():
             lbl_resultado.config(text="Error: Por favor completa ambos campos.", fg="red")
             return
 
-     # Verificar que el correo tenga un formato válido
+        # Verificar que el correo tenga un formato válido
         if not re.match(r'^.+@.+\..+$', correo):
             lbl_resultado.config(text="Error: Por favor ingresa un correo válido.", fg="red")
             return
@@ -35,45 +35,37 @@ def añadir():
             with sqlite3.connect("datos.db") as connect:
                 cursor = connect.cursor()
 
-            # Verificar si el nombre o correo ya existen en la base de datos
+                # Verificar si el nombre o correo ya existen en la base de datos
                 cursor.execute("SELECT Correo FROM Correos WHERE Correo=?", (correo,))
                 if cursor.fetchone():
                     lbl_resultado.config(text="Error: Este correo ya está en uso.", fg="red")
                     return
 
-            # Guardar el nuevo usuario
+                # Guardar el nuevo usuario
                 cursor.execute("INSERT INTO Correos (Correo, Nombre) VALUES (?, ?)", (correo, nombre,))
                 connect.commit()
-            lbl_resultado.config(text=f"{nombre} añadido con éxito.", fg="green")
+                lbl_resultado.config(text=f"{nombre} añadido con éxito.", fg="green")
         except sqlite3.Error as e:
             lbl_resultado.config(text=f"Error: {e}", fg="red")
 
-    # Crear una nueva ventana para añadir usuarios
-    ventana_añadir = tk.Toplevel(root)
-    ventana_añadir.title("")
-    ventana_añadir.tk.call("wm", "iconphoto", ventana_añadir._w, icono_tk)
-    ventana_añadir.geometry("400x250+1000+100")  # Ajustar el tamaño de la ventana
-    ventana_añadir.resizable(False, False)
-    
-    
-    # Crear etiquetas y campos de entrada para correo y nombre con un tamaño de fuente mayor
-    lbl_correo = tk.Label(ventana_añadir, text="Correo:", font=("Arial", 14))
-    lbl_correo.grid(row=0, column=0, padx=10, pady=5)
-    entry_correo = tk.Entry(ventana_añadir, font=("Arial", 12))
-    entry_correo.grid(row=0, column=1, padx=10, pady=5)
+    # Crear etiquetas y campos de entrada para correo y nombre
+    lbl_correo = tk.Label(root, text="Correo:", font=("Arial", 14))
+    lbl_correo.pack(padx=10, pady=5)
+    entry_correo = tk.Entry(root, font=("Arial", 12))
+    entry_correo.pack(padx=10, pady=5)
 
-    lbl_nombre = tk.Label(ventana_añadir, text="Nombre:", font=("Arial", 14))
-    lbl_nombre.grid(row=1, column=0, padx=10, pady=5)
-    entry_nombre = tk.Entry(ventana_añadir, font=("Arial", 12))
-    entry_nombre.grid(row=1, column=1, padx=10, pady=5)
+    lbl_nombre = tk.Label(root, text="Nombre:", font=("Arial", 14))
+    lbl_nombre.pack(padx=10, pady=5)
+    entry_nombre = tk.Entry(root, font=("Arial", 12))
+    entry_nombre.pack(padx=10, pady=5)
 
-    # Botón para guardar el usuario con un tamaño de fuente mayor
-    btn_guardar = tk.Button(ventana_añadir, text="Añadir", command=guardar, font=("Arial", 14))
-    btn_guardar.grid(row=2, columnspan=2, padx=10, pady=10)
+    # Botón para guardar el usuario
+    btn_guardar = tk.Button(root, text="Añadir", command=guardar, font=("Arial", 14))
+    btn_guardar.pack(padx=10, pady=10)
 
     # Etiqueta para mostrar el resultado de la operación
-    lbl_resultado = tk.Label(ventana_añadir, text="", font=("Arial", 12))
-    lbl_resultado.grid(row=3, columnspan=2, padx=10, pady=5)
+    lbl_resultado = tk.Label(root, text="", font=("Arial", 12))
+    lbl_resultado.pack(pady=5)
 
 
 def ver():
@@ -99,33 +91,29 @@ def ver():
         for usuario in usuarios:
             listbox.insert(tk.END, f"{usuario[1]} - {usuario[0]}")
         
-        if selected_index is not None:
-            listbox.selection_set(selected_index)
+        if selection:
+            listbox.selection_set(selection)
         
-        ventana_ver.after(3000, refresh)
+        root.after(3000, refresh)
     
-    ventana_ver = tk.Toplevel(root)
-    ventana_ver.title("")
-    ventana_ver.geometry("400x400+50+170")
-    ventana_ver.tk.call("wm", "iconphoto", ventana_ver._w, icono_tk)
-    ventana_ver.resizable(False, False)
-    frame = tk.Frame(ventana_ver)
-    frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-    
-    scrollbar = Scrollbar(frame, orient=tk.VERTICAL)
+    # Crear la lista y la barra de desplazamiento
+    scrollbar = tk.Scrollbar(root, orient=tk.VERTICAL)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     
-    listbox = tk.Listbox(frame, width=40, font=("Arial", 12), yscrollcommand=scrollbar.set)
+    listbox = tk.Listbox(root, width=40, font=("Arial", 12), yscrollcommand=scrollbar.set)
     listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     
     scrollbar.config(command=listbox.yview)
     
+    # Actualizar la lista de usuarios
     refresh()
     
-    btn_borrar = tk.Button(ventana_ver, text="Borrar", command=borrar_usuario, font=("Arial", 14))
-    btn_borrar.pack(padx=10, pady=10)
-    
-    ventana_ver.bind("<Delete>", borrar_usuario)
+    # Botón para borrar usuario
+    btn_borrar = tk.Button(root, text="Borrar", command=borrar_usuario, font=("Arial", 14))
+    btn_borrar.pack(padx=10, pady=50)
+
+    # Asignar evento de teclado para borrar usuario
+    root.bind("<Delete>", borrar_usuario)
 
 
 def perfect_shuffle(lista): 
@@ -203,9 +191,8 @@ connect.close()
 # Crear la ventana principal
 root = tk.Tk()
 root.title("Amigo Invisible")
-root.geometry("330x200+500+100")
+root.geometry("700x600+500+100")
 root.resizable(False, False)
-
 icono_bytes = base64.b64decode(icono_base64)
 icono_img = Image.open(BytesIO(icono_bytes))
 icono_tk = ImageTk.PhotoImage(icono_img)
@@ -216,14 +203,8 @@ root.tk.call("wm", "iconphoto", root._w, icono_tk)
 #Lanzar ambas ventanas
 ver()
 añadir()
-# Botones
-btn_agregar = tk.Button(root, text="Añadir", command=añadir, font=("Arial", 14))
-btn_agregar.pack(side=tk.LEFT, padx=10, pady=10, anchor="center")
-
-btn_ver = tk.Button(root, text="Ver", command=ver, font=("Arial", 14))
-btn_ver.pack(side=tk.LEFT, padx=10, pady=10, anchor="center")
 
 btn_enviar_correos = tk.Button(root, text="Enviar Correos", command=enviar_correos, font=("Arial", 14))
-btn_enviar_correos.pack(side=tk.LEFT, padx=10, pady=10, anchor="center")
+btn_enviar_correos.pack(side=tk.LEFT, padx=50, pady=10, anchor="center")
 # Ejecutar el bucle principal
 root.mainloop()
