@@ -81,7 +81,7 @@ def añadir():
 
 
 def ver():
-    def borrar_usuario():
+    def borrar_usuario(event=None):  # Añadir event=None para que la función pueda ser llamada sin un evento
         # Obtener el índice del elemento seleccionado en la Listbox
         seleccion = listbox.curselection()
         if not seleccion:
@@ -121,6 +121,9 @@ def ver():
     # Botón para borrar al usuario seleccionado
     btn_borrar = tk.Button(ventana_ver, text="Borrar", command=borrar_usuario, font=("Arial", 14))
     btn_borrar.pack(padx=10, pady=10)
+    
+    # Asociar la tecla "Suprimir" a la función de borrar usuario
+    ventana_ver.bind("<Delete>", borrar_usuario)
 
 # Función para obtener y eliminar parejas y enviar correos
 def enviar_correos():
