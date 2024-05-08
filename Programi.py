@@ -193,6 +193,7 @@ root = tk.Tk()
 root.title("Amigo Invisible")
 root.geometry("700x600+500+100")
 root.resizable(False, False)
+
 icono_bytes = base64.b64decode(icono_base64)
 icono_img = Image.open(BytesIO(icono_bytes))
 icono_tk = ImageTk.PhotoImage(icono_img)
